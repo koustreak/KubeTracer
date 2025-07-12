@@ -1,87 +1,46 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-# Explicitly declare text files you want to always be normalized and converted
-# to native line endings on checkout.
+# Go source files
 *.go text eol=lf
-*.md text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# YAML files
 *.yaml text eol=lf
 *.yml text eol=lf
+
+# JSON files
 *.json text eol=lf
-*.toml text eol=lf
-*.txt text eol=lf
-*.sh text eol=lf
-*.py text eol=lf
-*.js text eol=lf
-*.ts text eol=lf
-*.html text eol=lf
-*.css text eol=lf
+
+# Markdown files
+*.md text eol=lf
+
+# Dockerfile
+Dockerfile* text eol=lf
+
+# Makefile
+Makefile text eol=lf
+makefile text eol=lf
+
+# Protocol Buffers
 *.proto text eol=lf
 
-# Declare files that will always have CRLF line endings on checkout.
-*.bat text eol=crlf
-
-# Denote all files that are truly binary and should not be modified.
+# Binary files
 *.png binary
 *.jpg binary
 *.jpeg binary
 *.gif binary
 *.ico binary
-*.mov binary
-*.mp4 binary
-*.mp3 binary
-*.flv binary
-*.fla binary
-*.swf binary
-*.gz binary
-*.zip binary
-*.7z binary
-*.ttf binary
-*.eot binary
-*.woff binary
-*.woff2 binary
-*.pyc binary
 *.pdf binary
-*.ez binary
-*.bz2 binary
-*.swp binary
-*.jar binary
 
-# Archives
-*.7z binary
-*.gz binary
+# Archive files
 *.tar binary
+*.gz binary
 *.zip binary
+*.7z binary
 
-# Fonts
-*.ttf binary
-*.eot binary
-*.otf binary
-*.woff binary
-*.woff2 binary
-
-# Executables
+# Go binaries
 *.exe binary
-*.pyc binary
-
-# RC files (like .babelrc or .eslintrc)
-.*rc text
-
-# Ignore files (like .gitignore or .dockerignore)
-.*ignore text
-
-# Go specific
-go.mod text eol=lf
-go.sum text eol=lf
-
-# Docker
-Dockerfile* text eol=lf
-docker-compose*.yml text eol=lf
-
-# Kubernetes
-*.yaml linguist-detectable
-*.yml linguist-detectable
-
-# Helm
-Chart.yaml text eol=lf
-values.yaml text eol=lf
+kubetracer binary
