@@ -15,18 +15,18 @@ KubeTracer is a Kubernetes cluster scanning tool that extracts K8s components, e
 ### `/cmd` - Application Entry Point
 - `cmd/kubetracer/` - Main web server application (combines scanner + web UI)
 
-### `/internal` - Private Application Code
-- `internal/api/` - HTTP API handlers and routing
-- `internal/config/` - Configuration management
-- `internal/graph/` - Graph data structures and algorithms
-- `internal/lineage/` - Lineage calculation logic
-- `internal/models/` - Data models and structures
-- `internal/scanner/` - Kubernetes cluster scanning logic
-- `internal/storage/` - Data persistence layer (database, cache)
+### `/internal` - Private application code (cannot be imported by other projects)
+- `internal/api/` - HTTP REST API handlers, routes, middleware
+- `internal/config/` - Configuration loading, validation, environment management
+- `internal/graph/` - Graph data structures, algorithms for traversal/visualization
+- `internal/lineage/` - Core business logic for establishing resource relationships
+- `internal/models/` - Data structures representing K8s resources and relationships
+- `internal/scanner/` - K8s cluster scanning logic, resource discovery, in-cluster client
+- `internal/storage/` - Database/cache abstractions, data persistence
+- `internal/utils/` - Utility functions and helpers for internal use
 
-### `/pkg` - Public Library Code
-- `pkg/client/` - Kubernetes client wrappers
-- `pkg/utils/` - Utility functions and helpers
+### `/internal/utils` - Internal Utility Functions
+- `internal/utils/` - Utility functions and helpers for internal use
 
 ### `/web` - Web Application Assets
 - `web/static/` - CSS, JS, images

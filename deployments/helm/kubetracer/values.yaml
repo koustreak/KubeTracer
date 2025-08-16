@@ -1,0 +1,65 @@
+# Default values for kubetracer
+# This is a YAML-formatted file
+
+replicaCount: 1
+
+image:
+  repository: kubetracer/kubetracer
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+config:
+  server:
+    port: 8080
+    host: "0.0.0.0"
+    readTimeout: "10s"
+    writeTimeout: "10s"
+  scanner:
+    interval: "5m"
+    workers: 3
+  logging:
+    level: "info"  # trace, debug, info, warn, error, fatal, panic
+    format: "json"  # json or text
+  metrics:
+    enabled: true
+    port: 9090
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
