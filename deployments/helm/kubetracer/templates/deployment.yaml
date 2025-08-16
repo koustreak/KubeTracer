@@ -11,11 +11,10 @@ spec:
       {{- include "kubetracer.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- with .Values.podAnnotations }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-        {{- end }}
+      {{- end }}
       labels:
         {{- include "kubetracer.selectorLabels" . | nindent 8 }}
     spec:
@@ -32,50 +31,8 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.config.server.port }}
-              protocol: TCP
-            {{- if .Values.config.metrics.enabled }}
-            - name: metrics
-              containerPort: {{ .Values.config.metrics.port }}
-              protocol: TCP
-            {{- end }}
-          env:
-            - name: KUBETRACER_LOGGING_LEVEL
-              value: {{ .Values.config.logging.level }}
-            - name: KUBETRACER_LOGGING_FORMAT
-              value: {{ .Values.config.logging.format }}
-          livenessProbe:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - "ps aux | grep '[k]ubetracer' || exit 1"
-            initialDelaySeconds: 30
-            periodSeconds: 30
-            timeoutSeconds: 5
-            failureThreshold: 3
-          readinessProbe:
-            exec:
-              command:
-                - /bin/sh
-                - -c
-                - "ps aux | grep '[k]ubetracer' || exit 1"
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: config
-              mountPath: /etc/kubetracer
-              readOnly: true
-      volumes:
-        - name: config
-          configMap:
-            name: {{ include "kubetracer.fullname" . }}-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

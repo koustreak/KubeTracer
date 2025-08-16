@@ -1,9 +1,6 @@
 # Multi-stage build for smaller final image
 FROM golang:1.21-alpine AS builder
 
-# Install git and ca-certificates
-RUN apk add --no-cache git ca-certificates
-
 # Set working directory
 WORKDIR /app
 
@@ -34,21 +31,11 @@ WORKDIR /app
 # Copy binary from builder
 COPY --from=builder /app/kubetracer .
 
-# Copy configuration
-COPY --from=builder /app/configs ./configs
-
 # Change ownership
 RUN chown -R kubetracer:kubetracer /app
 
 # Switch to non-root user
 USER kubetracer
-
-# Expose port
-EXPOSE 8080
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 # Run the binary
 ENTRYPOINT ["./kubetracer"]
