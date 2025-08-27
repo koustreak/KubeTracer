@@ -7,10 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
 	"github.com/koustreak/kubetracer/internal/scanner"
 	"github.com/koustreak/kubetracer/internal/utils"
-	"github.com/sirupsen/logrus"
 )
 
 const (

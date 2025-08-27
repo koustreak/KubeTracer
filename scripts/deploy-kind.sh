@@ -6,34 +6,27 @@ set -e
 
 # Configuration
 APP_NAME="kubetracer"
-DOCKER_IMAGE="kubetracer/kubetracer:latest"
+DOCKER_USER="kdutta93"
+DOCKER_IMAGE="$DOCKER_USER/kubetracer"
 HELM_CHART_PATH="./deployments/helm/kubetracer"
 NAMESPACE="kubetracer"
 
-echo "🚀 Starting KubeTracer build and deployment process..."
+echo "🚀 Starting KubeTracer deployment process..."
 
-# Step 1: Build Docker image
-echo "📦 Building Docker image..."
-docker build -t "$DOCKER_IMAGE" .
-
-# Step 2: Load image into KIND cluster
-echo "📋 Loading image into KIND cluster..."
-kind load docker-image "$DOCKER_IMAGE"
-
-# Step 3: Create namespace
+# Step 1: Create namespace
 echo "🏗️  Creating namespace..."
 kubectl create namespace "$NAMESPACE" --dry-run=client -o yaml | kubectl apply -f -
 
-# Step 4: Deploy using Helm
+# Step 2: Deploy using Helm (pulls image from Docker Hub)
 echo "🎯 Deploying KubeTracer using Helm..."
 helm upgrade --install "$APP_NAME" "$HELM_CHART_PATH" \
     --namespace "$NAMESPACE" \
-    --set image.repository="kubetracer/kubetracer" \
+    --set image.repository="$DOCKER_IMAGE" \
     --set image.tag="latest" \
-    --set image.pullPolicy="Never" \
+    --set image.pullPolicy="Always" \
     --wait --timeout=300s
 
-# Step 5: Check deployment status
+# Step 3: Check deployment status
 echo "✅ Checking deployment status..."
 kubectl get pods -n "$NAMESPACE"
 kubectl get services -n "$NAMESPACE"

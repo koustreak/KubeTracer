@@ -9,15 +9,38 @@ KubeTracer is a tool designed to establish and visualize the lineage between all
 - Useful for debugging, auditing, and compliance
 
 ## Getting Started
+
+### Prerequisites
+- Go 1.22 or higher
+- Docker (for containerized deployment)
+- Kubernetes cluster access
+- kubectl configured
+
 1. **Clone the repository:**
    ```sh
    git clone https://github.com/koustreak/kubetracer.git
    cd kubetracer
    ```
-2. **Install dependencies:**
-   (Add installation instructions here based on your implementation language)
+2. **Build the application:**
+   ```sh
+   make build
+   ```
 3. **Run KubeTracer:**
-   (Add usage instructions here)
+   ```sh
+   ./bin/kubetracer
+   ```
+
+### Docker Deployment
+1. **Build Docker image:**
+   ```sh
+   make docker-build
+   ```
+2. **Deploy to Kubernetes:**
+   ```sh
+   make deploy-kind  # For KIND cluster
+   # or
+   kubectl apply -f deployments/kubernetes/
+   ```
 
 ## Supported Resources
 - Pod

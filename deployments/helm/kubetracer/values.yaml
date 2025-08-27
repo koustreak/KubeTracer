@@ -2,7 +2,7 @@
 replicaCount: 1
 
 image:
-  repository: kubetracer/kubetracer
+  repository: kdutta93/kubetracer
   pullPolicy: IfNotPresent
   tag: "latest"
 
