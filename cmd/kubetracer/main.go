@@ -10,6 +10,7 @@ import (
 
 	"github.com/koustreak/kubetracer/internal/scanner"
 	"github.com/koustreak/kubetracer/internal/utils"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -39,6 +40,9 @@ func main() {
 	// Create pod scanner
 	podScanner := scanner.NewPodScanner(client)
 
+	// Create secret scanner
+	secretScanner := scanner.NewSecretScanner(client)
+
 	// Create context with cancellation
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -53,15 +57,16 @@ func main() {
 		defer ticker.Stop()
 
 		// Initial scan
-		performNamespaceScan(ctx, namespaceScanner)
+		performNamespaceScan(ctx, namespaceScanner, logger)
 		performPodScan(ctx, podScanner, "kube-system") // Example: scan kube-system namespace
+		performSecretScan(ctx, secretScanner, logger)  // Scan secrets across all namespaces
 		// performAllPodsScan(ctx, podScanner) // Uncomment to scan all namespaces
 
 		// Periodic scans
 		for {
 			select {
 			case <-ticker.C:
-				performNamespaceScan(ctx, namespaceScanner)
+				performNamespaceScan(ctx, namespaceScanner, logger)
 				performPodScan(ctx, podScanner, "kube-system") // Example: scan kube-system namespace
 				// performAllPodsScan(ctx, podScanner) // Uncomment to scan all namespaces
 			case <-ctx.Done():
@@ -79,13 +84,53 @@ func main() {
 }
 
 // performNamespaceScan performs a namespace scan
-func performNamespaceScan(ctx context.Context, namespaceScanner *scanner.NamespaceScanner) {
-	namespaces, err := namespaceScanner.ListNamespaces(ctx)
+func performSecretScan(ctx context.Context, secretScanner *scanner.SecretScanner, logger *logrus.Logger) {
+	logger.Info("Starting secret scan...")
+
+	// Get all secrets across all namespaces
+	secrets, err := secretScanner.ListAllSecrets(ctx)
 	if err != nil {
+		logger.WithError(err).Error("Failed to scan secrets")
 		return
 	}
 
-	fmt.Printf("Found %d namespaces\n", len(namespaces))
+	logger.WithField("total_secrets", getTotalSecretsCount(secrets)).Info("Secret scan completed")
+
+	// Output the secrets map in the requested format
+	for namespace, secretList := range secrets {
+		logger.WithFields(logrus.Fields{
+			"namespace":    namespace,
+			"secret_count": len(secretList),
+		}).Info("Namespace secrets")
+
+		for _, secret := range secretList {
+			logger.WithFields(logrus.Fields{
+				"namespace":   namespace,
+				"secret_name": secret.Name,
+				"secret_type": secret.Type,
+				"data_keys":   secret.DataKeys,
+				"created":     secret.Created,
+			}).Info("Secret details")
+		}
+	}
+}
+
+func getTotalSecretsCount(secrets map[string][]scanner.SecretInfo) int {
+	total := 0
+	for _, secretList := range secrets {
+		total += len(secretList)
+	}
+	return total
+}
+
+func performNamespaceScan(ctx context.Context, namespaceScanner *scanner.NamespaceScanner, logger *logrus.Logger) {
+	namespaces, err := namespaceScanner.ListNamespaces(ctx)
+	if err != nil {
+		logger.WithError(err).Error("Failed to scan namespaces")
+		return
+	}
+
+	logger.WithField("namespace_count", len(namespaces)).Info("Namespace scan completed")
 }
 
 // performPodScan performs a pod scan for a specific namespace
